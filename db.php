@@ -1,9 +1,9 @@
 <?php
-// ดึงค่า URL เชื่อมต่อจากระบบ Railway โดยตรง (รองรับทั้งเครือข่ายภายในและภายนอก)
-$database_url = getenv('MYSQL_URL') ?: getenv('MYSQL_PUBLIC_URL');
+// ดึงค่า URL สำเร็จรูปจากระบบ Railway ที่เราตั้งไว้
+$database_url = getenv('DATABASE_URL');
 
 if ($database_url) {
-    // แปลงค่าจาก URL ไปเป็นตัวแปรต่างๆ อัตโนมัติ
+    // แยกส่วนประกอบของ URL อัตโนมัติ
     $dbparts = parse_url($database_url);
 
     $host = $dbparts['host'];
@@ -12,13 +12,18 @@ if ($database_url) {
     $db   = ltrim($dbparts['path'], '/');
     $port = $dbparts['port'];
 
+    // เชื่อมต่อเข้าฐานข้อมูล Cloud
     $conn = new mysqli($host, $user, $pass, $db, $port);
 } else {
     // เผื่อไว้รันบนคอมตัวเอง (Localhost)
     $conn = new mysqli("localhost", "root", "", "fivem_family");
 }
 
+// ตรวจสอบความผิดพลาด
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+// ตั้งค่าให้อ่านภาษาไทยได้ถูกต้อง
+$conn->set_charset("utf8mb4");
 ?>
