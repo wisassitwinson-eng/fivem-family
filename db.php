@@ -1,22 +1,22 @@
 <?php
-// ดึงค่า URL สำเร็จรูปจากระบบ Railway ที่เราตั้งไว้
+// ดึงค่า URL สำเร็จรูปจากระบบ Railway 
 $database_url = getenv('DATABASE_URL');
 
 if ($database_url) {
-    // แยกส่วนประกอบของ URL อัตโนมัติ
+    // แยกส่วนประกอบของ URL อัตโนมัติ ( FrankenPHP จะเข้าใจโครงสร้างนี้ได้ดีที่สุด )
     $dbparts = parse_url($database_url);
 
     $host = $dbparts['host'];
     $user = $dbparts['user'];
     $pass = $dbparts['pass'];
     $db   = ltrim($dbparts['path'], '/');
-    $port = $dbparts['port'];
+    $port = $dbparts['port'] ?: 3306;
 
     // เชื่อมต่อเข้าฐานข้อมูล Cloud
     $conn = new mysqli($host, $user, $pass, $db, $port);
 } else {
     // เผื่อไว้รันบนคอมตัวเอง (Localhost)
-    $conn = new mysqli("localhost", "root", "", "fivem_family");
+    $conn = new mysqli("127.0.0.1", "root", "", "fivem_family");
 }
 
 // ตรวจสอบความผิดพลาด
