@@ -3,73 +3,10 @@
 /**
  * mgr-7kx2q.php
  * หน้าหลังบ้านสำหรับเพิ่ม / แก้ไข / ลบสมาชิกในตระกูล
- * ตอนนี้ป้องกันด้วยรหัสผ่าน (ตั้งค่าผ่าน ENV: ADMIN_PASSWORD)
+ * ไม่มีลิงก์เชื่อมจากหน้า index.php — เข้าได้เฉพาะคนที่รู้ URL นี้เท่านั้น
+ * (อย่าแชร์ URL ของไฟล์นี้ให้คนนอกตระกูล)
  */
-session_start();
 require_once 'db.php';
-
-// ----- ตั้งรหัสผ่าน admin จาก Environment Variable -----
-// ไปตั้งค่าตัวแปร ADMIN_PASSWORD ในหน้า Variables ของ Railway (service tranquil-endurance)
-$adminPassword = getenv('ADMIN_PASSWORD') ?: 'changeme123'; // เปลี่ยนรหัสสำรองนี้ด้วยถ้าไม่ได้ตั้ง ENV
-
-// ----- ออกจากระบบ -----
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header('Location: mgr-7kx2q.php');
-    exit;
-}
-
-// ----- ตรวจสอบการล็อกอิน -----
-$loginError = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_password'])) {
-    if ($_POST['login_password'] === $adminPassword) {
-        $_SESSION['admin_logged_in'] = true;
-    } else {
-        $loginError = 'รหัสผ่านไม่ถูกต้อง';
-    }
-}
-
-// ----- ถ้ายังไม่ล็อกอิน ให้แสดงหน้า login แล้วหยุดทำงานทันที -----
-if (empty($_SESSION['admin_logged_in'])) {
-    $conn->close();
-    ?>
-    <!DOCTYPE html>
-    <html lang="th">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Admin Login</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
-        <style>
-            body { font-family: 'Noto Sans Thai', sans-serif; background-color: #0b0c10; }
-        </style>
-    </head>
-    <body class="min-h-screen flex items-center justify-center text-gray-200">
-        <div class="bg-[#15171c] border border-gray-700 rounded-xl p-8 w-full max-w-sm">
-            <h1 class="text-xl font-bold text-center mb-6">🔒 เข้าสู่ระบบ Admin</h1>
-            <?php if ($loginError): ?>
-                <div class="mb-4 px-4 py-2 rounded-lg text-sm bg-red-900/40 text-red-300 border border-red-700/50">
-                    <?= htmlspecialchars($loginError) ?>
-                </div>
-            <?php endif; ?>
-            <form method="POST" class="space-y-3">
-                <input type="password" name="login_password" placeholder="รหัสผ่าน" required autofocus
-                    class="w-full bg-[#0f1014] border border-gray-700 text-gray-200 rounded-lg py-2 px-3
-                           focus:outline-none focus:ring-2 focus:ring-gray-500">
-                <button type="submit"
-                    class="w-full bg-gray-700 hover:bg-gray-600 text-gray-100 font-bold py-2.5 rounded-lg transition">
-                    เข้าสู่ระบบ
-                </button>
-            </form>
-        </div>
-    </body>
-    </html>
-    <?php
-    exit;
-}
-
-// ----- ตั้งแต่จุดนี้ลงไปคือ login สำเร็จแล้ว -----
 
 $message = '';
 $messageType = '';
@@ -167,6 +104,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | Member Directory</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👑</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
@@ -244,15 +182,9 @@ $conn->close();
         <div class="text-center mb-8">
             <p class="text-gray-500 text-xs uppercase tracking-[0.3em] mb-1">Admin Idontknow</p>
             <h1 class="font-house text-3xl font-bold text-gray-100 tracking-wide">⚙ จัดการสมาชิกตระกูล</h1>
-            <div class="flex items-center justify-center gap-3 mt-1">
-                <a href="index.php" class="text-gray-500 hover:text-gray-300 text-xs underline transition">
-                    ← กลับไปหน้ารายชื่อสมาชิก
-                </a>
-                <span class="text-gray-700">|</span>
-                <a href="mgr-7kx2q.php?logout=1" class="text-gray-500 hover:text-red-400 text-xs underline transition">
-                    ออกจากระบบ
-                </a>
-            </div>
+            <a href="index.php" class="text-gray-500 hover:text-gray-300 text-xs underline transition">
+                ← กลับไปหน้ารายชื่อสมาชิก
+            </a>
         </div>
 
         <?php if ($message): ?>
@@ -357,11 +289,6 @@ $conn->close();
                                 <a href="mgr-7kx2q.php?edit_id=<?= $m['id'] ?>"
                                     class="btn-edit text-xs font-bold px-3 py-2 rounded-lg transition">
                                     แก้ไข
-                                </a>
-                                <a href="mgr-7kx2q.php?delete_id=<?= $m['id'] ?>"
-                                    onclick="return confirm('ยืนยันลบสมาชิก \"<?= $name ?>\" ออกจากตระกูล? การลบนี้ไม่สามารถย้อนกลับได้')"
-                                    class="btn-del text-xs font-bold px-3 py-2 rounded-lg transition">
-                                    ลบ
                                 </a>
                             </div>
                         </div>
