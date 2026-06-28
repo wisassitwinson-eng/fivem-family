@@ -9,7 +9,7 @@ session_start();
 require_once 'db.php';
 
 // ----- ตั้งรหัสผ่าน admin จาก Environment Variable -----
-$adminPassword = getenv('ADMIN_PASSWORD') ?: 'changeme123';
+$adminPassword = getenv('ADMIN_PASSWORD') ?: 'niran17988';
 
 // ----- ออกจากระบบ -----
 if (isset($_GET['logout'])) {
