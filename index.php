@@ -152,10 +152,15 @@ $conn->close();
     <div id="youtube-player" class="hidden"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
 
-    <button id="music-toggle" class="fixed bottom-5 left-5 z-50 bg-[#15171c]/90 hover:bg-[#1c1f26] border border-gray-700 text-gray-300 hover:text-white py-2.5 px-4 rounded-full shadow-xl transition-all duration-300 flex items-center gap-2 backdrop-blur-sm group" title="เปิด/ปิดเพลง">
-        <span id="music-icon" class="text-base transition-transform group-hover:scale-110">🔈</span>
-        <span class="text-xs font-medium tracking-wide text-gray-400 group-hover:text-gray-200 select-none">BGM</span>
-    </button>
+    <div class="fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-[#15171c]/90 border border-gray-700 py-2.5 px-4 rounded-full shadow-xl backdrop-blur-sm group transition-all duration-300">
+        <button id="music-toggle" class="text-gray-300 hover:text-white flex items-center gap-2" title="เปิด/ปิดเพลง">
+            <span id="music-icon" class="text-base transition-transform active:scale-90">🔈</span>
+            <span class="text-xs font-medium tracking-wide text-gray-400 select-none">BGM</span>
+        </button>
+        <input type="range" id="volume-slider" min="0" max="100" value="30" 
+            class="w-0 opacity-0 group-hover:w-20 group-hover:opacity-100 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 transition-all duration-300" 
+            title="ปรับระดับเสียง">
+    </div>
 
     <script>
         let player;
@@ -181,23 +186,46 @@ $conn->close();
         function onPlayerReady(event) {
             const toggleBtn = document.getElementById('music-toggle');
             const icon = document.getElementById('music-icon');
+            const volumeSlider = document.getElementById('volume-slider');
             
-            // ตั้งระดับเสียงเบื้องต้นของ YouTube ไว้ที่สูงสุด 100%
-            event.target.setVolume(100);
+            // ตั้งระดับเสียงเริ่มต้นไว้ซอฟต์ ๆ ที่ 30% จะได้ไม่ดังเกินไปตอนกดเปิดครั้งแรก
+            event.target.setVolume(30);
+            volumeSlider.value = 30;
 
+            // ระบบคลิกปุ่มเปิด-ปิดเพลง
             toggleBtn.addEventListener('click', () => {
                 if (!isPlaying) {
                     player.playVideo();
-                    icon.innerText = '🔊'; 
-                    toggleBtn.classList.add('border-gray-500', 'text-white');
+                    updateIcon(volumeSlider.value);
                     isPlaying = true;
                 } else {
                     player.pauseVideo();
                     icon.innerText = '🔈'; 
-                    toggleBtn.classList.remove('border-gray-500', 'text-white');
                     isPlaying = false;
                 }
             });
+
+            // ระบบเลื่อนสไลเดอร์เพื่อเพิ่ม-ลดระดับเสียงแบบเรียลไทม์
+            volumeSlider.addEventListener('input', (e) => {
+                const vol = e.target.value;
+                player.setVolume(vol);
+                if (isPlaying) {
+                    updateIcon(vol);
+                }
+            });
+
+            // ฟังก์ชันคอยเปลี่ยนหน้าตาไอคอนลำโพงตามระดับความดังเสียง
+            function updateIcon(vol) {
+                if (vol == 0) {
+                    icon.innerText = '🔇';
+                } else if (vol < 40) {
+                    icon.innerText = '🔈';
+                } else if (vol < 80) {
+                    icon.innerText = '🔉';
+                } else {
+                    icon.innerText = '🔊';
+                }
+            }
         }
     </script>
     <script>
