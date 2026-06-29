@@ -2,7 +2,7 @@
 
 /**
  * index.php
- * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time
+ * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time (ฉบับเรียบหรูคงเดิม เพิ่มดีเทล)
  */
 require_once 'db.php';
 
@@ -44,17 +44,28 @@ $conn->close();
         .card-row {
             background: linear-gradient(135deg, #15171c 0%, #1c1f26 100%);
             border: 1px solid #2a2e37;
-            transition: all 0.25s ease;
+            /* เพิ่มความสมูทในการขยับเพิ่มขึ้นนิดนึง */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .card-row:hover {
-            border-color: #4a5568;
-            box-shadow: 0 0 18px rgba(120, 140, 170, 0.12);
-            transform: translateY(-1px);
+            /* 1. ปรับขอบตอนชี้ให้เป็นสีสว่างโทนดาร์กแบบพรีเมียม ไม่สว่างวาบเกินไป */
+            border-color: #3f4452;
+            /* 2. เพิ่มมิติแสงเงาด้านล่างการ์ดให้ดูลอยเด่นขึ้นมาจากพื้นหลัง */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
         }
 
         .avatar-ring {
             border: 2px solid #3a3f4b;
+            /* 3. เพิ่มมิติเงาหลังรูปโปรไฟล์ไม่ให้ดูแบนเรียบไปกับกล่อง */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.3s ease;
+        }
+
+        /* 4. เมื่อเอาเมาส์ชี้ที่การ์ด ให้ขอบรูปโปรไฟล์สว่างรับกับขอบกล่องด้วย */
+        .card-row:hover .avatar-ring {
+            border-color: #52596b;
         }
 
         .fb-btn {
@@ -188,11 +199,9 @@ $conn->close();
             const icon = document.getElementById('music-icon');
             const volumeSlider = document.getElementById('volume-slider');
             
-            // ตั้งระดับเสียงเริ่มต้นไว้ซอฟต์ ๆ ที่ 30% จะได้ไม่ดังเกินไปตอนกดเปิดครั้งแรก
             event.target.setVolume(30);
             volumeSlider.value = 30;
 
-            // ระบบคลิกปุ่มเปิด-ปิดเพลง
             toggleBtn.addEventListener('click', () => {
                 if (!isPlaying) {
                     player.playVideo();
@@ -205,7 +214,6 @@ $conn->close();
                 }
             });
 
-            // ระบบเลื่อนสไลเดอร์เพื่อเพิ่ม-ลดระดับเสียงแบบเรียลไทม์
             volumeSlider.addEventListener('input', (e) => {
                 const vol = e.target.value;
                 player.setVolume(vol);
@@ -214,7 +222,6 @@ $conn->close();
                 }
             });
 
-            // ฟังก์ชันคอยเปลี่ยนหน้าตาไอคอนลำโพงตามระดับความดังเสียง
             function updateIcon(vol) {
                 if (vol == 0) {
                     icon.innerText = '🔇';
@@ -268,6 +275,7 @@ $conn->close();
                     <p class="font-bold text-gray-100 truncate">${name}</p>
                 </a>` : `<p class="font-bold text-gray-100 truncate">${name}</p>`;
 
+                /* คงคลาสเดิมไว้ทั้งหมดเพื่อความเสถียรของระบบ JavaScript ค้นหา */
                 return `
         <div class="card-row rounded-xl p-3 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
@@ -285,7 +293,6 @@ $conn->close();
             clearTimeout(debounceTimer);
             const keyword = searchInput.value.trim();
 
-            // หน่วงเวลาเล็กน้อยเพื่อลดการยิง request ถี่เกินไป
             debounceTimer = setTimeout(() => {
                 fetch('search.php?q=' + encodeURIComponent(keyword))
                     .then(res => res.json())
