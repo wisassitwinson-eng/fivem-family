@@ -149,6 +149,57 @@ $conn->close();
         </div>
     </div>
 
+    <div id="youtube-player" class="hidden"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <button id="music-toggle" class="fixed bottom-5 left-5 z-50 bg-[#15171c]/90 hover:bg-[#1c1f26] border border-gray-700 text-gray-300 hover:text-white py-2.5 px-4 rounded-full shadow-xl transition-all duration-300 flex items-center gap-2 backdrop-blur-sm group" title="เปิด/ปิดเพลง">
+        <span id="music-icon" class="text-base transition-transform group-hover:scale-110">🔈</span>
+        <span class="text-xs font-medium tracking-wide text-gray-400 group-hover:text-gray-200 select-none">BGM</span>
+    </button>
+
+    <script>
+        let player;
+        let isPlaying = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '0',
+                width: '0',
+                videoId: 'syUBwHazoIc', 
+                playerVars: {
+                    'autoplay': 0,      
+                    'loop': 1,          
+                    'playlist': 'syUBwHazoIc', 
+                    'controls': 0
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            const toggleBtn = document.getElementById('music-toggle');
+            const icon = document.getElementById('music-icon');
+            
+            // ตั้งระดับเสียงเบื้องต้นของ YouTube ไว้ที่สูงสุด 100%
+            event.target.setVolume(100);
+
+            toggleBtn.addEventListener('click', () => {
+                if (!isPlaying) {
+                    player.playVideo();
+                    icon.innerText = '🔊'; 
+                    toggleBtn.classList.add('border-gray-500', 'text-white');
+                    isPlaying = true;
+                } else {
+                    player.pauseVideo();
+                    icon.innerText = '🔈'; 
+                    toggleBtn.classList.remove('border-gray-500', 'text-white');
+                    isPlaying = false;
+                }
+            });
+        }
+    </script>
     <script>
         const searchInput = document.getElementById('searchInput');
         const memberList = document.getElementById('memberList');
