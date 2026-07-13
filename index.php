@@ -2,11 +2,11 @@
 
 /**
  * index.php
- * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time
+ * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time 
  */
 require_once 'db.php';
 
-// โหลดรายชื่อทั้งหมดตอนเปิดหน้าแรก
+// โหลดรายชื่อทั้งหมดตอนเปิดหน้าแรก 
 // เรียงคนที่ปักหมุด ไว้บนสุดตามเลขน้อย->มาก แล้วตามด้วยคนที่เหลือเรียงตามชื่อ A-Z
 $sql = "SELECT id, name, facebook_url, avatar_url, pin_order FROM members
         ORDER BY (pin_order IS NULL) ASC, pin_order ASC, name ASC";
@@ -158,7 +158,7 @@ $conn->close();
     <div id="youtube-player" class="hidden"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
 
-    <div class="fixed bottom-5 left-5 z-50 flex items-center gap-2.5 sm:gap-3 bg-[#15171c]/95 border border-gray-700 py-2 px-3.5 sm:px-4 rounded-full shadow-2xl backdrop-blur-md group transition-all duration-300 hover:scale-105 hover:border-gray-500 max-w-[340px] sm:max-w-[380px]">
+    <div class="fixed bottom-5 left-5 z-50 flex items-center gap-2.5 sm:gap-3 bg-[#15171c]/95 border border-gray-700 py-2 px-3.5 sm:px-4 rounded-full shadow-2xl backdrop-blur-md group transition-all duration-500 ease-out hover:scale-105 hover:border-gray-500 max-w-[200px] hover:max-w-[360px] sm:hover:max-w-[400px] overflow-hidden">
         
         <button id="mute-toggle" class="text-gray-300 hover:text-white flex items-center shrink-0 transition-transform active:scale-90" title="เปิด/ปิดเสียง">
             <span id="music-icon" class="text-base">🔈</span>
@@ -176,23 +176,23 @@ $conn->close();
             </div>
         </div>
 
-        <div class="flex items-center gap-1 shrink-0 bg-gray-800/80 px-2 py-1 rounded-full border border-gray-700">
-            <button id="prev-btn" class="text-gray-400 hover:text-white transition-colors active:scale-90" title="เพลงก่อนหน้า">
+        <div class="flex items-center gap-1 shrink-0 bg-gray-800/80 px-0 group-hover:px-2 py-1 rounded-full border border-transparent group-hover:border-gray-700 max-w-0 group-hover:max-w-[100px] opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out overflow-hidden">
+            <button id="prev-btn" class="text-gray-400 hover:text-white transition-colors active:scale-90 shrink-0" title="เพลงก่อนหน้า">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
             </button>
             
-            <button id="play-pause-btn" class="text-gray-200 hover:text-white transition-transform active:scale-90 w-5 h-5 flex items-center justify-center" title="เล่น / หยุด">
+            <button id="play-pause-btn" class="text-gray-200 hover:text-white transition-transform active:scale-90 w-5 h-5 flex items-center justify-center shrink-0" title="เล่น / หยุด">
                 <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current block" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
             </button>
 
-            <button id="next-btn" class="text-gray-400 hover:text-white transition-colors active:scale-90" title="เพลงถัดไป">
+            <button id="next-btn" class="text-gray-400 hover:text-white transition-colors active:scale-90 shrink-0" title="เพลงถัดไป">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
             </button>
         </div>
 
         <input type="range" id="volume-slider" min="0" max="100" value="30" 
-            class="w-0 opacity-0 group-hover:w-12 sm:group-hover:w-16 group-hover:max-w-[60px] sm:group-hover:max-w-[80px] group-hover:opacity-100 group-hover:ml-0.5 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 transition-all duration-300 shrink-0" 
+            class="w-0 opacity-0 group-hover:w-12 sm:group-hover:w-16 group-hover:max-w-[60px] sm:group-hover:max-w-[80px] group-hover:opacity-100 group-hover:ml-0.5 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 transition-all duration-500 ease-out shrink-0" 
             title="ปรับระดับเสียง">
     </div>
 
@@ -202,7 +202,7 @@ $conn->close();
         let isMuted = false;
         let previousVolume = 30;
 
-        // --- ตั้งค่ารายชื่อเพลงตามที่คุณขอมา ---
+        // --- ตั้งค่ารายชื่อเพลงใน Playlist ---
         const myPlaylist = [
             'QgaZeV4GZaU', // 0: SARAN x เถาวัลย์ - สถานีปลายทาง
             'syUBwHazoIc', // 1: Pondering - Flowers for u
@@ -269,14 +269,12 @@ $conn->close();
                 }
             });
 
-            // กดปุ่มเพลงถัดไป
             nextBtn.addEventListener('click', () => {
                 currentTrackIndex = (currentTrackIndex + 1) % myPlaylist.length;
                 player.nextVideo();
                 updateTrackInfo(currentTrackIndex);
             });
 
-            // กดปุ่มเพลงก่อนหน้า
             prevBtn.addEventListener('click', () => {
                 currentTrackIndex = (currentTrackIndex - 1 + myPlaylist.length) % myPlaylist.length;
                 player.previousVideo();
