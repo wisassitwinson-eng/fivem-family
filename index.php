@@ -163,13 +163,25 @@ $conn->close();
     <div id="youtube-player" class="hidden"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
 
-    <div class="fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-[#15171c]/90 border border-gray-700 py-2.5 px-4 rounded-full shadow-xl backdrop-blur-sm group transition-all duration-300">
-        <button id="music-toggle" class="text-gray-300 hover:text-white flex items-center gap-2" title="เปิด/ปิดเพลง">
+    <div class="fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-[#15171c]/90 border border-gray-700 py-2.5 px-4 rounded-full shadow-xl backdrop-blur-sm group transition-all duration-300 max-w-[280px] sm:max-w-[320px]">
+        <button id="music-toggle" class="text-gray-300 hover:text-white flex items-center gap-2 shrink-0" title="เปิด/ปิดเพลง">
             <span id="music-icon" class="text-base transition-transform active:scale-90">🔈</span>
-            <span class="text-xs font-medium tracking-wide text-gray-400 select-none">BGM</span>
         </button>
+
+        <div class="flex items-center gap-2.5 overflow-hidden">
+            <img id="bgm-cover" 
+                 src="https://i.ytimg.com/vi/QgaZeV4GZaU/maxresdefault.jpg" 
+                 alt="Cover" 
+                 class="w-7 h-7 rounded-full object-cover shrink-0 border border-gray-600 shadow-sm animate-[spin_10s_linear_infinite]">
+            
+            <div class="flex flex-col justify-center overflow-hidden">
+                <span class="text-[10px] text-gray-400 font-medium leading-none tracking-wider uppercase">Now Playing</span>
+                <span id="bgm-title" class="text-xs font-semibold text-gray-200 truncate leading-tight mt-0.5">SARAN x เถาวัลย์ - สถานีปลายทาง</span>
+            </div>
+        </div>
+
         <input type="range" id="volume-slider" min="0" max="100" value="30" 
-            class="w-0 opacity-0 group-hover:w-20 group-hover:opacity-100 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 transition-all duration-300" 
+            class="w-0 opacity-0 group-hover:w-16 sm:group-hover:w-20 group-hover:opacity-100 group-hover:ml-1 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 transition-all duration-300 shrink-0" 
             title="ปรับระดับเสียง">
     </div>
 
@@ -181,11 +193,11 @@ $conn->close();
             player = new YT.Player('youtube-player', {
                 height: '0',
                 width: '0',
-                videoId: 'syUBwHazoIc', 
+                videoId: 'QgaZeV4GZaU', 
                 playerVars: {
                     'autoplay': 0,      
                     'loop': 1,          
-                    'playlist': 'syUBwHazoIc', 
+                    'playlist': 'QgaZeV4GZaU', 
                     'controls': 0
                 },
                 events: {
