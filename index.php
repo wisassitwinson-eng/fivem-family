@@ -2,12 +2,12 @@
 
 /**
  * index.php
- * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time 
+ * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time (ฉบับเรียบหรูคงเดิม + BGM เล่นออโต้ตามสั่ง)
  */
 require_once 'db.php';
 
-// โหลดรายชื่อทั้งหมดตอนเปิดหน้าแรก 
-// เรียงคนที่ปักหมุด ไว้บนสุดตามเลขน้อย->มาก แล้วตามด้วยคนที่เหลือเรียงตามชื่อ A-Z
+// โหลดรายชื่อทั้งหมดตอนเปิดหน้าแรก (ก่อนพิมพ์ค้นหา)
+// เรียงคนที่ปักหมุด (pin_order ไม่เป็น NULL) ไว้บนสุดตามเลขน้อย->มาก แล้วตามด้วยคนที่เหลือเรียงตามชื่อ A-Z
 $sql = "SELECT id, name, facebook_url, avatar_url, pin_order FROM members
         ORDER BY (pin_order IS NULL) ASC, pin_order ASC, name ASC";
 $result = $conn->query($sql);
@@ -202,7 +202,6 @@ $conn->close();
         let isMuted = false;
         let previousVolume = 30;
 
-        // --- ตั้งค่ารายชื่อเพลงใน Playlist ---
         const myPlaylist = [
             'QgaZeV4GZaU', // 0: SARAN x เถาวัลย์ - สถานีปลายทาง
             'syUBwHazoIc', // 1: Pondering - Flowers for u
@@ -223,7 +222,7 @@ $conn->close();
                 width: '0',
                 videoId: myPlaylist[0], 
                 playerVars: {
-                    'autoplay': 0,      
+                    'autoplay': 1,      // เปิดคำสั่ง Autoplay เล่นอัตโนมัติทันที
                     'loop': 1,          
                     'playlist': myPlaylist.join(','), 
                     'controls': 0
@@ -245,6 +244,25 @@ $conn->close();
             
             event.target.setVolume(30);
             volumeSlider.value = 30;
+
+            // สั่งให้พยายามเล่นเพลงทันทีที่โหลด Player เสร็จ
+            player.playVideo();
+
+            // ระบบดักจับข้อจำกัดเบราว์เซอร์: ถ้า Autoplay โดนบล็อก ทันทีที่ผู้ใช้ขยับเมาส์หรือเลื่อนจอ จะเปิดเพลงให้ทันที
+            const startAudioOnFirstInteraction = () => {
+                if (!isPlaying && player && typeof player.playVideo === 'function') {
+                    player.playVideo();
+                }
+                document.removeEventListener('click', startAudioOnFirstInteraction);
+                document.removeEventListener('scroll', startAudioOnFirstInteraction);
+                document.removeEventListener('mousemove', startAudioOnFirstInteraction);
+                document.removeEventListener('touchstart', startAudioOnFirstInteraction);
+            };
+
+            document.addEventListener('click', startAudioOnFirstInteraction);
+            document.addEventListener('scroll', startAudioOnFirstInteraction);
+            document.addEventListener('mousemove', startAudioOnFirstInteraction);
+            document.addEventListener('touchstart', startAudioOnFirstInteraction);
 
             playPauseBtn.addEventListener('click', () => {
                 if (!isPlaying) {
