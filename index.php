@@ -158,7 +158,7 @@ $conn->close();
     <div id="youtube-player" class="hidden"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
 
-    <div class="fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-[#15171c]/95 border border-gray-700 py-2.5 px-4 rounded-full shadow-2xl backdrop-blur-md group transition-all duration-300 hover:scale-105 hover:border-gray-500 max-w-[320px] sm:max-w-[360px]">
+    <div class="fixed bottom-5 left-5 z-50 flex items-center gap-2.5 sm:gap-3 bg-[#15171c]/95 border border-gray-700 py-2 px-3.5 sm:px-4 rounded-full shadow-2xl backdrop-blur-md group transition-all duration-300 hover:scale-105 hover:border-gray-500 max-w-[340px] sm:max-w-[380px]">
         
         <button id="mute-toggle" class="text-gray-300 hover:text-white flex items-center shrink-0 transition-transform active:scale-90" title="เปิด/ปิดเสียง">
             <span id="music-icon" class="text-base">🔈</span>
@@ -170,13 +170,13 @@ $conn->close();
                  alt="Cover" 
                  class="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-600 shadow-sm animate-[spin_10s_linear_infinite]">
             
-            <div class="flex flex-col justify-center overflow-hidden w-24 sm:w-28">
+            <div class="flex flex-col justify-center overflow-hidden w-20 sm:w-24">
                 <span class="text-[9px] text-gray-400 font-medium leading-none tracking-wider uppercase">Now Playing</span>
                 <span id="bgm-title" class="text-xs font-semibold text-gray-200 truncate leading-tight mt-0.5">สถานีปลายทาง - SARAN</span>
             </div>
         </div>
 
-        <div class="flex items-center gap-1.5 shrink-0 bg-gray-800/80 px-2 py-1 rounded-full border border-gray-700">
+        <div class="flex items-center gap-1 shrink-0 bg-gray-800/80 px-2 py-1 rounded-full border border-gray-700">
             <button id="prev-btn" class="text-gray-400 hover:text-white transition-colors active:scale-90" title="เพลงก่อนหน้า">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
             </button>
@@ -192,7 +192,7 @@ $conn->close();
         </div>
 
         <input type="range" id="volume-slider" min="0" max="100" value="30" 
-            class="w-0 opacity-0 group-hover:w-14 sm:group-hover:w-16 group-hover:opacity-100 group-hover:ml-0.5 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 transition-all duration-300 shrink-0" 
+            class="w-0 opacity-0 group-hover:w-12 sm:group-hover:w-16 group-hover:max-w-[60px] sm:group-hover:max-w-[80px] group-hover:opacity-100 group-hover:ml-0.5 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 transition-all duration-300 shrink-0" 
             title="ปรับระดับเสียง">
     </div>
 
@@ -231,7 +231,6 @@ $conn->close();
             event.target.setVolume(30);
             volumeSlider.value = 30;
 
-            // กดปุ่ม เล่น/หยุด เพลง
             playPauseBtn.addEventListener('click', () => {
                 if (!isPlaying) {
                     player.playVideo();
@@ -240,7 +239,6 @@ $conn->close();
                 }
             });
 
-            // กดปุ่มปิดเสียง / เปิดเสียง (Mute/Unmute)
             muteBtn.addEventListener('click', () => {
                 if (!isMuted) {
                     previousVolume = volumeSlider.value > 0 ? volumeSlider.value : 30;
@@ -256,7 +254,6 @@ $conn->close();
                 }
             });
 
-            // กดปุ่มเปลี่ยนเพลง (เนื่องจากใส่เพลงเดียว ระบบจะเริ่มเล่นเพลงเดิมใหม่ตั้งแต่ต้น)
             nextBtn.addEventListener('click', () => {
                 player.nextVideo();
             });
@@ -285,7 +282,6 @@ $conn->close();
             }
         }
 
-        // คอยเช็คสถานะจาก YouTube ถ้าเล่นให้เปลี่ยนรูปเป็นปุ่มหยุด ถ้าหยุดให้เปลี่ยนเป็นปุ่มเล่น
         function onPlayerStateChange(event) {
             const playIcon = document.getElementById('play-icon');
             const pauseIcon = document.getElementById('pause-icon');
