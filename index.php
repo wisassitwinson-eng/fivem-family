@@ -44,26 +44,21 @@ $conn->close();
         .card-row {
             background: linear-gradient(135deg, #15171c 0%, #1c1f26 100%);
             border: 1px solid #2a2e37;
-            /* เพิ่มความสมูทในการขยับเพิ่มขึ้นนิดนึง */
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .card-row:hover {
-            /* 1. ปรับขอบตอนชี้ให้เป็นสีสว่างโทนดาร์กแบบพรีเมียม ไม่สว่างวาบเกินไป */
             border-color: #3f4452;
-            /* 2. เพิ่มมิติแสงเงาด้านล่างการ์ดให้ดูลอยเด่นขึ้นมาจากพื้นหลัง */
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
             transform: translateY(-2px);
         }
 
         .avatar-ring {
             border: 2px solid #3a3f4b;
-            /* 3. เพิ่มมิติเงาหลังรูปโปรไฟล์ไม่ให้ดูแบนเรียบไปกับกล่อง */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
             transition: border-color 0.3s ease;
         }
 
-        /* 4. เมื่อเอาเมาส์ชี้ที่การ์ด ให้ขอบรูปโปรไฟล์สว่างรับกับขอบกล่องด้วย */
         .card-row:hover .avatar-ring {
             border-color: #52596b;
         }
@@ -163,31 +158,49 @@ $conn->close();
     <div id="youtube-player" class="hidden"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
 
-    <div class="fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-[#15171c]/90 border border-gray-700 py-2.5 px-4 rounded-full shadow-xl backdrop-blur-sm group transition-all duration-300 max-w-[280px] sm:max-w-[320px]">
-        <button id="music-toggle" class="text-gray-300 hover:text-white flex items-center gap-2 shrink-0" title="เปิด/ปิดเพลง">
-            <span id="music-icon" class="text-base transition-transform active:scale-90">🔈</span>
+    <div class="fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-[#15171c]/95 border border-gray-700 py-2.5 px-4 rounded-full shadow-2xl backdrop-blur-md group transition-all duration-300 hover:scale-105 hover:border-gray-500 max-w-[320px] sm:max-w-[360px]">
+        
+        <button id="mute-toggle" class="text-gray-300 hover:text-white flex items-center shrink-0 transition-transform active:scale-90" title="เปิด/ปิดเสียง">
+            <span id="music-icon" class="text-base">🔈</span>
         </button>
 
-        <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="flex items-center gap-2 overflow-hidden shrink-0">
             <img id="bgm-cover" 
                  src="https://i.ytimg.com/vi/QgaZeV4GZaU/maxresdefault.jpg" 
                  alt="Cover" 
-                 class="w-7 h-7 rounded-full object-cover shrink-0 border border-gray-600 shadow-sm animate-[spin_10s_linear_infinite]">
+                 class="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-600 shadow-sm animate-[spin_10s_linear_infinite]">
             
-            <div class="flex flex-col justify-center overflow-hidden">
-                <span class="text-[10px] text-gray-400 font-medium leading-none tracking-wider uppercase">Now Playing</span>
-                <span id="bgm-title" class="text-xs font-semibold text-gray-200 truncate leading-tight mt-0.5">SARAN x เถาวัลย์ - สถานีปลายทาง</span>
+            <div class="flex flex-col justify-center overflow-hidden w-24 sm:w-28">
+                <span class="text-[9px] text-gray-400 font-medium leading-none tracking-wider uppercase">Now Playing</span>
+                <span id="bgm-title" class="text-xs font-semibold text-gray-200 truncate leading-tight mt-0.5">สถานีปลายทาง - SARAN</span>
             </div>
         </div>
 
+        <div class="flex items-center gap-1.5 shrink-0 bg-gray-800/80 px-2 py-1 rounded-full border border-gray-700">
+            <button id="prev-btn" class="text-gray-400 hover:text-white transition-colors active:scale-90" title="เพลงก่อนหน้า">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+            
+            <button id="play-pause-btn" class="text-gray-200 hover:text-white transition-transform active:scale-90 w-5 h-5 flex items-center justify-center" title="เล่น / หยุด">
+                <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current block" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+
+            <button id="next-btn" class="text-gray-400 hover:text-white transition-colors active:scale-90" title="เพลงถัดไป">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+        </div>
+
         <input type="range" id="volume-slider" min="0" max="100" value="30" 
-            class="w-0 opacity-0 group-hover:w-16 sm:group-hover:w-20 group-hover:opacity-100 group-hover:ml-1 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 transition-all duration-300 shrink-0" 
+            class="w-0 opacity-0 group-hover:w-14 sm:group-hover:w-16 group-hover:opacity-100 group-hover:ml-0.5 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-gray-400 transition-all duration-300 shrink-0" 
             title="ปรับระดับเสียง">
     </div>
 
     <script>
         let player;
         let isPlaying = false;
+        let isMuted = false;
+        let previousVolume = 30;
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtube-player', {
@@ -201,37 +214,62 @@ $conn->close();
                     'controls': 0
                 },
                 events: {
-                    'onReady': onPlayerReady
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
                 }
             });
         }
 
         function onPlayerReady(event) {
-            const toggleBtn = document.getElementById('music-toggle');
+            const muteBtn = document.getElementById('mute-toggle');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
             const icon = document.getElementById('music-icon');
             const volumeSlider = document.getElementById('volume-slider');
             
             event.target.setVolume(30);
             volumeSlider.value = 30;
 
-            toggleBtn.addEventListener('click', () => {
+            // กดปุ่ม เล่น/หยุด เพลง
+            playPauseBtn.addEventListener('click', () => {
                 if (!isPlaying) {
                     player.playVideo();
-                    updateIcon(volumeSlider.value);
-                    isPlaying = true;
                 } else {
                     player.pauseVideo();
-                    icon.innerText = '🔈'; 
-                    isPlaying = false;
                 }
+            });
+
+            // กดปุ่มปิดเสียง / เปิดเสียง (Mute/Unmute)
+            muteBtn.addEventListener('click', () => {
+                if (!isMuted) {
+                    previousVolume = volumeSlider.value > 0 ? volumeSlider.value : 30;
+                    player.setVolume(0);
+                    volumeSlider.value = 0;
+                    icon.innerText = '🔇';
+                    isMuted = true;
+                } else {
+                    player.setVolume(previousVolume);
+                    volumeSlider.value = previousVolume;
+                    updateIcon(previousVolume);
+                    isMuted = false;
+                }
+            });
+
+            // กดปุ่มเปลี่ยนเพลง (เนื่องจากใส่เพลงเดียว ระบบจะเริ่มเล่นเพลงเดิมใหม่ตั้งแต่ต้น)
+            nextBtn.addEventListener('click', () => {
+                player.nextVideo();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                player.previousVideo();
             });
 
             volumeSlider.addEventListener('input', (e) => {
                 const vol = e.target.value;
                 player.setVolume(vol);
-                if (isPlaying) {
-                    updateIcon(vol);
-                }
+                if (vol > 0) isMuted = false;
+                updateIcon(vol);
             });
 
             function updateIcon(vol) {
@@ -244,6 +282,27 @@ $conn->close();
                 } else {
                     icon.innerText = '🔊';
                 }
+            }
+        }
+
+        // คอยเช็คสถานะจาก YouTube ถ้าเล่นให้เปลี่ยนรูปเป็นปุ่มหยุด ถ้าหยุดให้เปลี่ยนเป็นปุ่มเล่น
+        function onPlayerStateChange(event) {
+            const playIcon = document.getElementById('play-icon');
+            const pauseIcon = document.getElementById('pause-icon');
+            const cover = document.getElementById('bgm-cover');
+
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+                pauseIcon.classList.add('block');
+                cover.style.animationPlayState = 'running';
+            } else {
+                isPlaying = false;
+                playIcon.classList.remove('hidden');
+                playIcon.classList.add('block');
+                pauseIcon.classList.add('hidden');
+                cover.style.animationPlayState = 'paused';
             }
         }
     </script>
@@ -287,7 +346,6 @@ $conn->close();
                     <p class="font-bold text-gray-100 truncate">${name}</p>
                 </a>` : `<p class="font-bold text-gray-100 truncate">${name}</p>`;
 
-                /* คงคลาสเดิมไว้ทั้งหมดเพื่อความเสถียรของระบบ JavaScript ค้นหา */
                 return `
         <div class="card-row rounded-xl p-3 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
