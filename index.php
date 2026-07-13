@@ -2,7 +2,7 @@
 
 /**
  * index.php
- * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time (ฉบับเรียบหรูคงเดิม + BGM เล่นออโต้ด้วยเทคนิค Muted Autoplay)
+ * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time (ฉบับเรียบหรูคงเดิม + อัปเกรดดีเทล 3 ข้อ + BGM เล่นออโต้)
  */
 require_once 'db.php';
 
@@ -93,10 +93,13 @@ $conn->close();
     <div class="max-w-2xl mx-auto py-10 px-4">
 
         <div class="text-center mb-8">
-            <p class="text-gray-500 text-xs uppercase tracking-[0.3em] mb-1">Idontknow</p>
-            <h1 class="font-house text-3xl md:text-4xl font-bold text-gray-100 tracking-wide">
-                House Idontknow
-            </h1>
+            <div class="inline-block relative">
+                <div class="absolute -inset-1 bg-gradient-to-r from-amber-500/20 to-blue-500/20 rounded-full blur-md -z-10"></div>
+                <p class="text-gray-500 text-xs uppercase tracking-[0.3em] mb-1">Idontknow</p>
+                <h1 class="font-house text-3xl md:text-4xl font-bold text-gray-100 tracking-wide drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">
+                    House Idontknow
+                </h1>
+            </div>
             <p class="text-gray-500 text-sm mt-1">Member of Idontknow</p>
             <div class="w-24 h-px bg-gray-700 mx-auto mt-4"></div>
         </div>
@@ -124,12 +127,13 @@ $conn->close();
                     <?php
                     $name = htmlspecialchars($m['name']);
                     $fb   = htmlspecialchars($m['facebook_url']);
-                    $avatar = htmlspecialchars($m['avatar_url'] ?: 'https://i.pravatar.cc/150?u=' . $m['id']);
+                    // 1. ปรับรูปเริ่มต้นให้ใช้บริการ UI Avatars สีทอง-ดาร์ก ดูเข้าธีมและมีเส้นขอบชัดเจน
+                    $avatar = htmlspecialchars($m['avatar_url'] ?: 'https://ui-avatars.com/api/?name=' . urlencode($m['name']) . '&background=2a2e37&color=cbd5e1&size=150');
                     ?>
                     <div class="card-row rounded-xl p-3 flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0">
                             <img src="<?= $avatar ?>" alt="<?= $name ?>" referrerpolicy="no-referrer"
-                                class="w-12 h-12 rounded-full object-cover avatar-ring flex-shrink-0">
+                                class="w-12 h-12 rounded-full object-cover avatar-ring flex-shrink-0 bg-[#2a2e37]">
                             <div class="min-w-0">
                                 <?php if ($fb): ?>
                                     <a href="<?= $fb ?>" target="_blank" rel="noopener noreferrer" class="hover:underline">
@@ -152,6 +156,10 @@ $conn->close();
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
+        </div>
+
+        <div class="text-center mt-12 mb-6">
+            <p class="text-gray-600 text-[11px] tracking-wider uppercase">© 2026 House Idontknow. All rights reserved.</p>
         </div>
     </div>
 
@@ -222,7 +230,7 @@ $conn->close();
                 width: '0',
                 videoId: myPlaylist[0], 
                 playerVars: {
-                    'autoplay': 1,      // สั่งให้เล่นออโต้ทันที
+                    'autoplay': 1,      
                     'loop': 1,          
                     'playlist': myPlaylist.join(','), 
                     'controls': 0
@@ -242,19 +250,16 @@ $conn->close();
             const icon = document.getElementById('music-icon');
             const volumeSlider = document.getElementById('volume-slider');
             
-            // 1. สั่งเปิดเล่นแบบ "ปิดเสียง (Mute)" ไปก่อนเลย เบราว์เซอร์ยอมให้เล่นทันที 100%
             player.mute();
             player.playVideo();
             volumeSlider.value = 30;
 
-            // 2. ฟังก์ชันปลดล็อกเสียง: ทันทีที่มีการแตะจอ คลิก เลื่อนเพจ หรือกดแป้นพิมพ์
             const unlockAudio = () => {
                 if (player && typeof player.unMute === 'function') {
                     player.unMute();
                     player.setVolume(30);
                     player.playVideo();
                     
-                    // เช็คว่าเบราว์เซอร์ยอมปล่อยเสียงหรือยัง ถ้าไม่โดนบล็อกถึงจะยกเลิกตัวดักจับ
                     if (!player.isMuted()) {
                         volumeSlider.value = 30;
                         updateIcon(30);
@@ -268,7 +273,6 @@ $conn->close();
                 }
             };
 
-            // ดักจับทุกการสัมผัสหรือขยับตัวบนหน้าเว็บ
             window.addEventListener('click', unlockAudio);
             window.addEventListener('scroll', unlockAudio);
             window.addEventListener('keydown', unlockAudio);
@@ -382,7 +386,8 @@ $conn->close();
             memberList.innerHTML = members.map(m => {
                 const name = escapeHtml(m.name);
                 const fb = m.facebook_url ? escapeHtml(m.facebook_url) : '';
-                const avatar = escapeHtml(m.avatar_url || ('https://i.pravatar.cc/150?u=' + m.id));
+                // 1. อัปเกรด JavaScript ให้ตอนพิมพ์ค้นหา ก็ดึงรูป Default สไตล์เดียวกันมาแสดงผล
+                const avatar = escapeHtml(m.avatar_url || ('https://ui-avatars.com/api/?name=' . urlencode(m.name) . '&background=2a2e37&color=cbd5e1&size=150'));
 
                 const fbButton = fb ? `
             <a href="${fb}" target="_blank" rel="noopener noreferrer"
@@ -401,7 +406,7 @@ $conn->close();
                 return `
         <div class="card-row rounded-xl p-3 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
-                <img src="${avatar}" alt="${name}" referrerpolicy="no-referrer" class="w-12 h-12 rounded-full object-cover avatar-ring flex-shrink-0">
+                <img src="${avatar}" alt="${name}" referrerpolicy="no-referrer" class="w-12 h-12 rounded-full object-cover avatar-ring flex-shrink-0 bg-[#2a2e37]">
                 <div class="min-w-0">
                     ${nameSection}
                 </div>
