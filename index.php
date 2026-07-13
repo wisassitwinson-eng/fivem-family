@@ -2,7 +2,7 @@
 
 /**
  * index.php
- * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time (ฉบับเรียบหรูคงเดิม + BGM เล่นออโต้ตามสั่ง)
+ * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time (ฉบับเรียบหรูคงเดิม + BGM เล่นออโต้ด้วยเทคนิค Muted Autoplay)
  */
 require_once 'db.php';
 
@@ -222,7 +222,7 @@ $conn->close();
                 width: '0',
                 videoId: myPlaylist[0], 
                 playerVars: {
-                    'autoplay': 1,      // เปิดคำสั่ง Autoplay เล่นอัตโนมัติทันที
+                    'autoplay': 1,      // สั่งให้เล่นออโต้ทันที
                     'loop': 1,          
                     'playlist': myPlaylist.join(','), 
                     'controls': 0
@@ -242,27 +242,38 @@ $conn->close();
             const icon = document.getElementById('music-icon');
             const volumeSlider = document.getElementById('volume-slider');
             
-            event.target.setVolume(30);
+            // 1. สั่งเปิดเล่นแบบ "ปิดเสียง (Mute)" ไปก่อนเลย เบราว์เซอร์ยอมให้เล่นทันที 100%
+            player.mute();
+            player.playVideo();
             volumeSlider.value = 30;
 
-            // สั่งให้พยายามเล่นเพลงทันทีที่โหลด Player เสร็จ
-            player.playVideo();
-
-            // ระบบดักจับข้อจำกัดเบราว์เซอร์: ถ้า Autoplay โดนบล็อก ทันทีที่ผู้ใช้ขยับเมาส์หรือเลื่อนจอ จะเปิดเพลงให้ทันที
-            const startAudioOnFirstInteraction = () => {
-                if (!isPlaying && player && typeof player.playVideo === 'function') {
+            // 2. ฟังก์ชันปลดล็อกเสียง: ทันทีที่มีการแตะจอ คลิก เลื่อนเพจ หรือกดแป้นพิมพ์
+            const unlockAudio = () => {
+                if (player && typeof player.unMute === 'function') {
+                    player.unMute();
+                    player.setVolume(30);
                     player.playVideo();
+                    
+                    // เช็คว่าเบราว์เซอร์ยอมปล่อยเสียงหรือยัง ถ้าไม่โดนบล็อกถึงจะยกเลิกตัวดักจับ
+                    if (!player.isMuted()) {
+                        volumeSlider.value = 30;
+                        updateIcon(30);
+                        isPlaying = true;
+                        window.removeEventListener('click', unlockAudio);
+                        window.removeEventListener('scroll', unlockAudio);
+                        window.removeEventListener('keydown', unlockAudio);
+                        window.removeEventListener('touchstart', unlockAudio);
+                        window.removeEventListener('pointerdown', unlockAudio);
+                    }
                 }
-                document.removeEventListener('click', startAudioOnFirstInteraction);
-                document.removeEventListener('scroll', startAudioOnFirstInteraction);
-                document.removeEventListener('mousemove', startAudioOnFirstInteraction);
-                document.removeEventListener('touchstart', startAudioOnFirstInteraction);
             };
 
-            document.addEventListener('click', startAudioOnFirstInteraction);
-            document.addEventListener('scroll', startAudioOnFirstInteraction);
-            document.addEventListener('mousemove', startAudioOnFirstInteraction);
-            document.addEventListener('touchstart', startAudioOnFirstInteraction);
+            // ดักจับทุกการสัมผัสหรือขยับตัวบนหน้าเว็บ
+            window.addEventListener('click', unlockAudio);
+            window.addEventListener('scroll', unlockAudio);
+            window.addEventListener('keydown', unlockAudio);
+            window.addEventListener('touchstart', unlockAudio);
+            window.addEventListener('pointerdown', unlockAudio);
 
             playPauseBtn.addEventListener('click', () => {
                 if (!isPlaying) {
