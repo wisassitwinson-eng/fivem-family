@@ -2,12 +2,12 @@
 
 /**
  * index.php
- * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time (ฉบับเรียบหรูคงเดิม เพิ่มดีเทล)
+ * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time
  */
 require_once 'db.php';
 
-// โหลดรายชื่อทั้งหมดตอนเปิดหน้าแรก (ก่อนพิมพ์ค้นหา)
-// เรียงคนที่ปักหมุด (pin_order ไม่เป็น NULL) ไว้บนสุดตามเลขน้อย->มาก แล้วตามด้วยคนที่เหลือเรียงตามชื่อ A-Z
+// โหลดรายชื่อทั้งหมดตอนเปิดหน้าแรก
+// เรียงคนที่ปักหมุด ไว้บนสุดตามเลขน้อย->มาก แล้วตามด้วยคนที่เหลือเรียงตามชื่อ A-Z
 $sql = "SELECT id, name, facebook_url, avatar_url, pin_order FROM members
         ORDER BY (pin_order IS NULL) ASC, pin_order ASC, name ASC";
 $result = $conn->query($sql);
@@ -202,15 +202,30 @@ $conn->close();
         let isMuted = false;
         let previousVolume = 30;
 
+        // --- ตั้งค่ารายชื่อเพลงตามที่คุณขอมา ---
+        const myPlaylist = [
+            'QgaZeV4GZaU', // 0: SARAN x เถาวัลย์ - สถานีปลายทาง
+            'syUBwHazoIc', // 1: Pondering - Flowers for u
+            'YThCJNzrp3Q'  // 2: Pondering - ไม่ต้องกระซิบ
+        ];
+
+        const trackDetails = [
+            { title: "สถานีปลายทาง - SARAN", id: "QgaZeV4GZaU" },
+            { title: "Flowers for u - Pondering", id: "syUBwHazoIc" },
+            { title: "ไม่ต้องกระซิบ - Pondering", id: "YThCJNzrp3Q" }
+        ];
+
+        let currentTrackIndex = 0;
+
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtube-player', {
                 height: '0',
                 width: '0',
-                videoId: 'QgaZeV4GZaU', 
+                videoId: myPlaylist[0], 
                 playerVars: {
                     'autoplay': 0,      
                     'loop': 1,          
-                    'playlist': 'QgaZeV4GZaU', 
+                    'playlist': myPlaylist.join(','), 
                     'controls': 0
                 },
                 events: {
@@ -254,12 +269,18 @@ $conn->close();
                 }
             });
 
+            // กดปุ่มเพลงถัดไป
             nextBtn.addEventListener('click', () => {
+                currentTrackIndex = (currentTrackIndex + 1) % myPlaylist.length;
                 player.nextVideo();
+                updateTrackInfo(currentTrackIndex);
             });
 
+            // กดปุ่มเพลงก่อนหน้า
             prevBtn.addEventListener('click', () => {
+                currentTrackIndex = (currentTrackIndex - 1 + myPlaylist.length) % myPlaylist.length;
                 player.previousVideo();
+                updateTrackInfo(currentTrackIndex);
             });
 
             volumeSlider.addEventListener('input', (e) => {
@@ -299,6 +320,14 @@ $conn->close();
                 playIcon.classList.add('block');
                 pauseIcon.classList.add('hidden');
                 cover.style.animationPlayState = 'paused';
+            }
+        }
+
+        function updateTrackInfo(index) {
+            const track = trackDetails[index];
+            if (track) {
+                document.getElementById('bgm-title').innerText = track.title;
+                document.getElementById('bgm-cover').src = `https://i.ytimg.com/vi/${track.id}/maxresdefault.jpg`;
             }
         }
     </script>
