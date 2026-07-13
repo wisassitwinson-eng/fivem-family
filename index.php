@@ -2,7 +2,7 @@
 
 /**
  * index.php
- * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time (ฉบับเรียบหรูคงเดิม + อัปเกรดดีเทล 3 ข้อ + BGM เล่นออโต้)
+ * หน้าแสดงรายชื่อสมาชิกตระกูล + ค้นหาแบบ Real-time (ฉบับเรียบหรูคงเดิม + อัปเกรดดีเทลครบทุกข้อ + BGM เล่นออโต้)
  */
 require_once 'db.php';
 
@@ -127,7 +127,7 @@ $conn->close();
                     <?php
                     $name = htmlspecialchars($m['name']);
                     $fb   = htmlspecialchars($m['facebook_url']);
-                    // 1. ปรับรูปเริ่มต้นให้ใช้บริการ UI Avatars สีทอง-ดาร์ก ดูเข้าธีมและมีเส้นขอบชัดเจน
+                    // เปลี่ยนรูปเริ่มต้นคนไม่มีรูปให้เป็นตัวย่อสีเทาเงิน พื้นหลังโทนดาร์ก มีขอบมิติเข้ากับคนอื่น
                     $avatar = htmlspecialchars($m['avatar_url'] ?: 'https://ui-avatars.com/api/?name=' . urlencode($m['name']) . '&background=2a2e37&color=cbd5e1&size=150');
                     ?>
                     <div class="card-row rounded-xl p-3 flex items-center justify-between gap-3">
@@ -161,9 +161,8 @@ $conn->close();
         <div class="text-center mt-12 mb-6">
             <p class="text-gray-600 text-[11px] tracking-wider uppercase">© 2026 House Idontknow. All rights reserved.</p>
         </div>
-    </div>
 
-    <div id="youtube-player" class="hidden"></div>
+    </div> <div id="youtube-player" class="hidden"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <div class="fixed bottom-5 left-5 z-50 flex items-center gap-2.5 sm:gap-3 bg-[#15171c]/95 border border-gray-700 py-2 px-3.5 sm:px-4 rounded-full shadow-2xl backdrop-blur-md group transition-all duration-500 ease-out hover:scale-105 hover:border-gray-500 max-w-[200px] hover:max-w-[360px] sm:hover:max-w-[400px] overflow-hidden">
@@ -386,7 +385,7 @@ $conn->close();
             memberList.innerHTML = members.map(m => {
                 const name = escapeHtml(m.name);
                 const fb = m.facebook_url ? escapeHtml(m.facebook_url) : '';
-                // 1. อัปเกรด JavaScript ให้ตอนพิมพ์ค้นหา ก็ดึงรูป Default สไตล์เดียวกันมาแสดงผล
+                // ตอนพิมพ์ค้นหา ก็ดึงรูป Default สไตล์เดียวกันมาแสดงผลไม่ให้หลุดธีม
                 const avatar = escapeHtml(m.avatar_url || ('https://ui-avatars.com/api/?name=' . urlencode(m.name) . '&background=2a2e37&color=cbd5e1&size=150'));
 
                 const fbButton = fb ? `
